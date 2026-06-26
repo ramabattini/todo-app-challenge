@@ -1,4 +1,4 @@
-package com.ramiro.todoapp.navigation
+package com.ramiro.todoapp.ui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel

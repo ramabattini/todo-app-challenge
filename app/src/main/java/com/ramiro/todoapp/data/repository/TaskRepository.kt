@@ -3,10 +3,10 @@ package com.ramiro.todoapp.data.repository
 import com.ramiro.todoapp.data.model.CreateTaskRequest
 import com.ramiro.todoapp.data.model.Task
 import com.ramiro.todoapp.data.model.UpdateTaskRequest
-import com.ramiro.todoapp.data.remote.RetrofitClient
+import com.ramiro.todoapp.data.network.NetworkClient
 
 class TaskRepository {
-    private val api = RetrofitClient.api
+    private val api = NetworkClient.api
 
     suspend fun getTasks(): List<Task> = api.getTasks()
 

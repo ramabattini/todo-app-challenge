@@ -1,4 +1,4 @@
-package com.ramiro.todoapp.data.remote
+package com.ramiro.todoapp.data.network
 
 import com.ramiro.todoapp.data.model.CreateTaskRequest
 import com.ramiro.todoapp.data.model.Task
