@@ -46,6 +46,8 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    // Iconos extendidos de Material (para CheckCircle, ArrowBack, etc.)
+    implementation("androidx.compose.material:material-icons-extended")
     // Retrofit + Gson para llamadas a Supabase
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
