@@ -1,5 +1,7 @@
 package com.ramiro.todoapp.ui.navigation
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -12,12 +14,40 @@ import com.ramiro.todoapp.ui.screens.TaskFormScreen
 import com.ramiro.todoapp.ui.screens.TaskListScreen
 import com.ramiro.todoapp.ui.viewmodel.TaskViewModel
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
     val viewModel: TaskViewModel = viewModel()
 
-    NavHost(navController = navController, startDestination = "task_list") {
+    NavHost(
+        navController = navController,
+        startDestination = "task_list",
+        enterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { it },
+                animationSpec = tween(300)
+            )
+        },
+        exitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { -it / 3 },
+                animationSpec = tween(300)
+            )
+        },
+        popEnterTransition = {
+            slideInHorizontally(
+                initialOffsetX = { -it / 3 },
+                animationSpec = tween(300)
+            )
+        },
+        popExitTransition = {
+            slideOutHorizontally(
+                targetOffsetX = { it },
+                animationSpec = tween(300)
+            )
+        }
+    ) {
         composable("task_list") {
             TaskListScreen(
                 viewModel = viewModel,
