@@ -1,5 +1,8 @@
 package com.ramiro.todoapp.ui.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +16,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -47,26 +51,6 @@ fun TaskListScreen(
         }
     ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
-            Row(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                FilterChip(
-                    selected = selectedFilter == "all",
-                    onClick = { selectedFilter = "all" },
-                    label = { Text("Todas") }
-                )
-                FilterChip(
-                    selected = selectedFilter == "pending",
-                    onClick = { selectedFilter = "pending" },
-                    label = { Text("Pendientes") }
-                )
-                FilterChip(
-                    selected = selectedFilter == "done",
-                    onClick = { selectedFilter = "done" },
-                    label = { Text("Completadas") }
-                )
-            }
 
             when (val state = uiState) {
                 is UiState.Loading -> {
@@ -76,25 +60,76 @@ fun TaskListScreen(
                 }
                 is UiState.Error -> {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
                             Text("Error: ${state.message}")
                             Button(onClick = { viewModel.loadTasks() }) { Text("Reintentar") }
                         }
                     }
                 }
                 is UiState.Success -> {
+                    val total = state.tasks.size
+                    val completed = state.tasks.count { it.isCompleted }
+                    val pending = total - completed
+
+                    // Tarjeta de estadísticas
+                    AnimatedVisibility(
+                        visible = total > 0,
+                        enter = fadeIn(),
+                        exit = fadeOut()
+                    ) {
+                        StatsCard(total = total, completed = completed, pending = pending)
+                    }
+
+                    // Filtros
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        FilterChip(
+                            selected = selectedFilter == "all",
+                            onClick = { selectedFilter = "all" },
+                            label = { Text("Todas") }
+                        )
+                        FilterChip(
+                            selected = selectedFilter == "pending",
+                            onClick = { selectedFilter = "pending" },
+                            label = { Text("Pendientes") }
+                        )
+                        FilterChip(
+                            selected = selectedFilter == "done",
+                            onClick = { selectedFilter = "done" },
+                            label = { Text("Completadas") }
+                        )
+                    }
+
                     val filtered = when (selectedFilter) {
                         "pending" -> state.tasks.filter { !it.isCompleted }
                         "done" -> state.tasks.filter { it.isCompleted }
                         else -> state.tasks
                     }
+
                     if (filtered.isEmpty()) {
                         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                            Text(
-                                text = "No hay tareas",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = Color.Gray
-                            )
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = if (total == 0) "No hay tareas todavía" else "No hay tareas en esta categoría",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = Color.Gray
+                                )
+                                if (total == 0) {
+                                    Text(
+                                        text = "Tocá + para crear tu primera tarea",
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = Color.Gray
+                                    )
+                                }
+                            }
                         }
                     } else {
                         LazyColumn(
@@ -113,6 +148,49 @@ fun TaskListScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun StatsCard(total: Int, completed: Int, pending: Int) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            StatItem(value = total, label = "Total", color = MaterialTheme.colorScheme.onPrimaryContainer)
+            VerticalDivider(modifier = Modifier.height(40.dp))
+            StatItem(value = pending, label = "Pendientes", color = Color(0xFFFB8C00))
+            VerticalDivider(modifier = Modifier.height(40.dp))
+            StatItem(value = completed, label = "Completadas", color = Color(0xFF43A047))
+        }
+    }
+}
+
+@Composable
+fun StatItem(value: Int, label: String, color: Color) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(
+            text = value.toString(),
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = color
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = color
+        )
     }
 }
 
