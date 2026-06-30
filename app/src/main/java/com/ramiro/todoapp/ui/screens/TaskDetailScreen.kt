@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.ramiro.todoapp.data.model.Priority
 import com.ramiro.todoapp.data.model.Task
 import com.ramiro.todoapp.ui.viewmodel.TaskViewModel
 import com.ramiro.todoapp.ui.viewmodel.UiState
@@ -84,16 +85,13 @@ fun TaskDetailScreen(
 
 @Composable
 fun TaskDetailContent(task: Task, modifier: Modifier = Modifier) {
-    val priorityColor = when (task.priority) {
-        "high" -> Color(0xFFE53935)
-        "medium" -> Color(0xFFFB8C00)
-        else -> Color(0xFF43A047)
+    val priority = Priority.fromValue(task.priority)
+    val priorityColor = when (priority) {
+        Priority.HIGH -> Color(0xFFE53935)
+        Priority.MEDIUM -> Color(0xFFFB8C00)
+        Priority.LOW -> Color(0xFF43A047)
     }
-    val priorityLabel = when (task.priority) {
-        "high" -> "Alta"
-        "medium" -> "Media"
-        else -> "Baja"
-    }
+    val priorityLabel = priority.label
 
     Column(
         modifier = modifier

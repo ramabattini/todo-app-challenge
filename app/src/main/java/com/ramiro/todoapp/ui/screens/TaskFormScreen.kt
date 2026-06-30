@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.ramiro.todoapp.data.model.Priority
 import com.ramiro.todoapp.ui.viewmodel.TaskViewModel
 import com.ramiro.todoapp.ui.viewmodel.UiState
 
@@ -76,15 +77,11 @@ fun TaskFormScreen(
 
             Text("Prioridad", style = MaterialTheme.typography.titleSmall)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                listOf(
-                    "low" to "Baja",
-                    "medium" to "Media",
-                    "high" to "Alta"
-                ).forEach { (value, label) ->
+                Priority.entries.forEach { p ->
                     FilterChip(
-                        selected = priority == value,
-                        onClick = { priority = value },
-                        label = { Text(label) }
+                        selected = priority == p.value,
+                        onClick = { priority = p.value },
+                        label = { Text(p.label) }
                     )
                 }
             }

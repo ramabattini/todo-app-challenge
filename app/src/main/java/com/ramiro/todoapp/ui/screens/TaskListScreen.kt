@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.ramiro.todoapp.data.model.Priority
 import com.ramiro.todoapp.data.model.Task
 import com.ramiro.todoapp.ui.viewmodel.TaskViewModel
 import com.ramiro.todoapp.ui.viewmodel.UiState
@@ -196,16 +197,13 @@ fun StatItem(value: Int, label: String, color: Color) {
 
 @Composable
 fun TaskCard(task: Task, onToggle: () -> Unit, onClick: () -> Unit) {
-    val priorityColor = when (task.priority) {
-        "high" -> Color(0xFFE53935)
-        "medium" -> Color(0xFFFB8C00)
-        else -> Color(0xFF43A047)
+    val priority = Priority.fromValue(task.priority)
+    val priorityColor = when (priority) {
+        Priority.HIGH -> Color(0xFFE53935)
+        Priority.MEDIUM -> Color(0xFFFB8C00)
+        Priority.LOW -> Color(0xFF43A047)
     }
-    val priorityLabel = when (task.priority) {
-        "high" -> "Alta"
-        "medium" -> "Media"
-        else -> "Baja"
-    }
+    val priorityLabel = priority.label
 
     Card(
         modifier = Modifier
