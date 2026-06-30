@@ -18,7 +18,7 @@ import com.ramiro.todoapp.ui.viewmodel.TaskViewModel
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    val viewModel: TaskViewModel = viewModel()
+    val viewModel: TaskViewModel = viewModel(factory = TaskViewModel.Factory)
 
     NavHost(
         navController = navController,

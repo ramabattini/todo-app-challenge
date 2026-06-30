@@ -33,9 +33,19 @@ fun TaskListScreen(
     onAddClick: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val actionError by viewModel.actionError.collectAsState()
     var selectedFilter by remember { mutableStateOf("all") }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(actionError) {
+        actionError?.let {
+            snackbarHostState.showSnackbar(it)
+            viewModel.clearActionError()
+        }
+    }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Mis Tareas") },

@@ -26,7 +26,7 @@ fun TaskFormScreen(
 
     var title by remember(existingTask) { mutableStateOf(existingTask?.title ?: "") }
     var description by remember(existingTask) { mutableStateOf(existingTask?.description ?: "") }
-    var priority by remember(existingTask) { mutableStateOf(existingTask?.priority ?: "medium") }
+    var priority by remember(existingTask) { mutableStateOf(existingTask?.priority ?: Priority.MEDIUM.value) }
     var titleError by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
 
@@ -101,14 +101,18 @@ fun TaskFormScreen(
                             title = title.trim(),
                             description = description.trim(),
                             priority = priority,
-                            isCompleted = existingTask.isCompleted
-                        ) { onBack() }
+                            isCompleted = existingTask.isCompleted,
+                            onSuccess = { onBack() },
+                            onError = { isLoading = false }
+                        )
                     } else {
                         viewModel.createTask(
                             title = title.trim(),
                             description = description.trim(),
-                            priority = priority
-                        ) { onBack() }
+                            priority = priority,
+                            onSuccess = { onBack() },
+                            onError = { isLoading = false }
+                        )
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

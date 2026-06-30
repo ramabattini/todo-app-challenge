@@ -1,8 +1,10 @@
 package com.ramiro.todoapp.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.ramiro.todoapp.data.model.Task
+import com.ramiro.todoapp.data.repository.SupabaseTaskRepository
 import com.ramiro.todoapp.data.repository.TaskRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -15,11 +17,16 @@ sealed class UiState {
     data class Error(val message: String) : UiState()
 }
 
-class TaskViewModel : ViewModel() {
-    private val repository = TaskRepository()
+class TaskViewModel(
+    private val repository: TaskRepository
+) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
+
+    // Errores de acciones puntuales (toggle, delete) sin tirar abajo la lista
+    private val _actionError = MutableStateFlow<String?>(null)
+    val actionError: StateFlow<String?> = _actionError.asStateFlow()
 
     init {
         loadTasks()
@@ -32,19 +39,26 @@ class TaskViewModel : ViewModel() {
                 val tasks = repository.getTasks()
                 _uiState.value = UiState.Success(tasks)
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.message ?: "Error desconocido")
+                _uiState.value = UiState.Error(e.message ?: "Error al cargar las tareas")
             }
         }
     }
 
-    fun createTask(title: String, description: String, priority: String, onSuccess: () -> Unit) {
+    fun createTask(
+        title: String,
+        description: String,
+        priority: String,
+        onSuccess: () -> Unit,
+        onError: () -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 repository.createTask(title, description, priority)
                 loadTasks()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.message ?: "Error al crear tarea")
+                onError()
+                _actionError.value = e.message ?: "Error al crear la tarea"
             }
         }
     }
@@ -55,7 +69,8 @@ class TaskViewModel : ViewModel() {
         description: String,
         priority: String,
         isCompleted: Boolean,
-        onSuccess: () -> Unit
+        onSuccess: () -> Unit,
+        onError: () -> Unit
     ) {
         viewModelScope.launch {
             try {
@@ -63,7 +78,8 @@ class TaskViewModel : ViewModel() {
                 loadTasks()
                 onSuccess()
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.message ?: "Error al actualizar tarea")
+                onError()
+                _actionError.value = e.message ?: "Error al actualizar la tarea"
             }
         }
     }
@@ -74,7 +90,8 @@ class TaskViewModel : ViewModel() {
                 repository.toggleCompleted(task.id, !task.isCompleted)
                 loadTasks()
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.message ?: "Error")
+                // Error puntual: no borramos la lista, mostramos snackbar
+                _actionError.value = "No se pudo actualizar la tarea"
             }
         }
     }
@@ -85,7 +102,20 @@ class TaskViewModel : ViewModel() {
                 repository.deleteTask(id)
                 loadTasks()
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.message ?: "Error al eliminar")
+                _actionError.value = "No se pudo eliminar la tarea"
+            }
+        }
+    }
+
+    fun clearActionError() {
+        _actionError.value = null
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return TaskViewModel(SupabaseTaskRepository()) as T
             }
         }
     }
