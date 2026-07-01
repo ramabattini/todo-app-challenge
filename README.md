@@ -58,14 +58,7 @@ TaskListScreen
 
 ## Herramientas de IA
 
-Usé Claude de Anthropic como asistente principal durante el desarrollo. Lo usé para:
-- Generar el scaffolding inicial de la arquitectura MVVM
-- Implementar las pantallas en Jetpack Compose
-- Configurar Retrofit para consumir la API REST de Supabase
-- Escribir los tests unitarios del ViewModel con FakeRepository
-- Revisar y corregir bugs en el código generado
-
-Mi rol fue definir la arquitectura, tomar decisiones técnicas, auditar cada archivo generado, corregir errores de compilación y validar que los flujos de la app funcionaran correctamente.
+Usé Claude de Anthropic como asistente durante el desarrollo. Me ayudó a generar código más rápido mientras yo tomaba las decisiones de arquitectura, revisaba cada archivo y corregía los errores que aparecían.
 
 ## Stack
 
