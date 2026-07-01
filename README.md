@@ -42,7 +42,7 @@ Usé Claude de Anthropic como asistente durante el desarrollo. Me ayudó a gener
 3. Esperar el Gradle Sync
 4. Correr en dispositivo o emulador con API 26+
 
-No requiere configuración extra, las credenciales de Supabase ya están en `core/Constants.kt`.
+Las credenciales de Supabase se leen desde `local.properties` (no se commitean por seguridad). Copiá `local.properties.example` a `local.properties` y completá los valores que te compartiré por separado.
 
 ## Tests
 

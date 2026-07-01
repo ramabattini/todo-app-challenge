@@ -84,8 +84,7 @@ fun TaskDetailScreen(
                 text = { Text("¿Estás seguro que querés eliminar esta tarea?") },
                 confirmButton = {
                     TextButton(onClick = {
-                        viewModel.deleteTask(taskId)
-                        onBack()
+                        viewModel.deleteTask(taskId, onSuccess = onBack)
                     }) {
                         Text("Eliminar", color = Color(0xFFE53935))
                     }

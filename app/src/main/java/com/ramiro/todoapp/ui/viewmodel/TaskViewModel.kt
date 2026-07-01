@@ -44,7 +44,11 @@ class TaskViewModel(
 
     // Refresh inline: suspend para que onSuccess() corra DESPUES de que la lista este actualizada
     private suspend fun refreshTasks() {
-        _uiState.value = UiState.Success(repository.getTasks())
+        try {
+            _uiState.value = UiState.Success(repository.getTasks())
+        } catch (e: Exception) {
+            _actionError.value = e.message ?: "Error al actualizar la lista"
+        }
     }
 
     fun createTask(
@@ -98,11 +102,12 @@ class TaskViewModel(
         }
     }
 
-    fun deleteTask(id: Long) {
+    fun deleteTask(id: Long, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             try {
                 repository.deleteTask(id)
                 refreshTasks()
+                onSuccess()
             } catch (e: Exception) {
                 _actionError.value = "No se pudo eliminar la tarea"
             }

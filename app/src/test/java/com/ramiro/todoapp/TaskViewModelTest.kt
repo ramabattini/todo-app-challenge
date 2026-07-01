@@ -91,7 +91,7 @@ class TaskViewModelTest {
         advanceUntilIdle()
 
         // La lista sigue visible (no se reemplaza con Error)
-        assertTrue(vm.uiState.value is UiState.Success || vm.uiState.value is UiState.Error)
+        assertTrue(vm.uiState.value is UiState.Success)
         assertNotNull(vm.actionError.value)
     }
 
