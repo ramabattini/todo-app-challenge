@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramiro.todoapp.data.model.Priority
 import com.ramiro.todoapp.data.model.Task
 import com.ramiro.todoapp.ui.viewmodel.TaskViewModel
@@ -24,8 +25,9 @@ fun TaskDetailScreen(
     onEditClick: () -> Unit,
     onBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val task = (uiState as? UiState.Success)?.tasks?.find { it.id == taskId }
+    val taskNotFound = uiState is UiState.Success && task == null
     var showDeleteDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -38,11 +40,13 @@ fun TaskDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = onEditClick) {
-                        Icon(Icons.Default.Edit, contentDescription = "Editar")
-                    }
-                    IconButton(onClick = { showDeleteDialog = true }) {
-                        Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color(0xFFE53935))
+                    if (task != null) {
+                        IconButton(onClick = onEditClick) {
+                            Icon(Icons.Default.Edit, contentDescription = "Editar")
+                        }
+                        IconButton(onClick = { showDeleteDialog = true }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Eliminar", tint = Color(0xFFE53935))
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -54,12 +58,23 @@ fun TaskDetailScreen(
             )
         }
     ) { padding ->
-        if (task == null) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+        when {
+            taskNotFound -> {
+                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text("Tarea no encontrada", style = MaterialTheme.typography.titleMedium)
+                        Button(onClick = onBack) { Text("Volver") }
+                    }
+                }
             }
-        } else {
-            TaskDetailContent(task = task, modifier = Modifier.padding(padding))
+            task == null -> {
+                Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
+            }
+            else -> {
+                TaskDetailContent(task = task, modifier = Modifier.padding(padding))
+            }
         }
 
         if (showDeleteDialog) {
@@ -91,7 +106,6 @@ fun TaskDetailContent(task: Task, modifier: Modifier = Modifier) {
         Priority.MEDIUM -> Color(0xFFFB8C00)
         Priority.LOW -> Color(0xFF43A047)
     }
-    val priorityLabel = priority.label
 
     Column(
         modifier = modifier
@@ -107,7 +121,7 @@ fun TaskDetailContent(task: Task, modifier: Modifier = Modifier) {
         ) {
             Surface(color = priorityColor.copy(alpha = 0.15f), shape = MaterialTheme.shapes.small) {
                 Text(
-                    text = "Prioridad: $priorityLabel",
+                    text = "Prioridad: ${priority.label}",
                     modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                     style = MaterialTheme.typography.labelMedium,
                     color = priorityColor

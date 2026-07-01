@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ramiro.todoapp.data.model.Priority
 import com.ramiro.todoapp.data.model.Task
 import com.ramiro.todoapp.ui.viewmodel.TaskViewModel
@@ -32,8 +33,8 @@ fun TaskListScreen(
     onTaskClick: (Long) -> Unit,
     onAddClick: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
-    val actionError by viewModel.actionError.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val actionError by viewModel.actionError.collectAsStateWithLifecycle()
     var selectedFilter by remember { mutableStateOf("all") }
     val snackbarHostState = remember { SnackbarHostState() }
 

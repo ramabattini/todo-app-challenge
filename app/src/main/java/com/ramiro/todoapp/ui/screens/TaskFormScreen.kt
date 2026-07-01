@@ -8,6 +8,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.unit.dp
 import com.ramiro.todoapp.data.model.Priority
 import com.ramiro.todoapp.ui.viewmodel.TaskViewModel
@@ -20,7 +21,7 @@ fun TaskFormScreen(
     viewModel: TaskViewModel,
     onBack: () -> Unit
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val existingTask = taskId?.let { id -> (uiState as? UiState.Success)?.tasks?.find { it.id == id } }
     val isEditing = existingTask != null
 
