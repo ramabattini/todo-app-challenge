@@ -96,7 +96,7 @@ fun TaskFormScreen(
                         return@Button
                     }
                     isLoading = true
-                    if (isEditing && existingTask != null) {
+                    if (existingTask != null) {
                         viewModel.updateTask(
                             id = existingTask.id,
                             title = title.trim(),

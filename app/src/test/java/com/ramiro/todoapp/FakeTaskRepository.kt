@@ -3,7 +3,7 @@ package com.ramiro.todoapp
 import com.ramiro.todoapp.data.model.Task
 import com.ramiro.todoapp.data.repository.TaskRepository
 
-class FakeTaskRepository(private val tasks: List<Task> = emptyList()) : TaskRepository {
+open class FakeTaskRepository(private val tasks: List<Task> = emptyList()) : TaskRepository {
 
     override suspend fun getTasks(): List<Task> = tasks
 
