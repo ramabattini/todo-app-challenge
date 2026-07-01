@@ -12,7 +12,8 @@ class SupabaseTaskRepository(
     override suspend fun getTasks(): List<Task> = api.getTasks()
 
     override suspend fun createTask(title: String, description: String, priority: String): Task =
-        api.createTask(CreateTaskRequest(title, description, priority)).first()
+        api.createTask(CreateTaskRequest(title, description, priority))
+            .firstOrNull() ?: throw Exception("No se pudo crear la tarea")
 
     override suspend fun updateTask(
         id: Long,
@@ -23,13 +24,14 @@ class SupabaseTaskRepository(
     ): Task = api.updateTask(
         idFilter = "eq.$id",
         task = UpdateTaskRequest(title, description, priority, isCompleted)
-    ).first()
+    ).firstOrNull() ?: throw Exception("No se pudo actualizar la tarea")
 
     override suspend fun toggleCompleted(id: Long, isCompleted: Boolean) {
-        api.updateTask(
+        val result = api.updateTask(
             idFilter = "eq.$id",
             task = UpdateTaskRequest(isCompleted = isCompleted)
         )
+        if (result.isEmpty()) throw Exception("No se encontro la tarea")
     }
 
     override suspend fun deleteTask(id: Long) {

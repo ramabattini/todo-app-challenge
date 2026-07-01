@@ -24,7 +24,6 @@ class TaskViewModel(
     private val _uiState = MutableStateFlow<UiState>(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
-    // Errores de acciones puntuales (toggle, delete) sin tirar abajo la lista
     private val _actionError = MutableStateFlow<String?>(null)
     val actionError: StateFlow<String?> = _actionError.asStateFlow()
 
@@ -36,12 +35,16 @@ class TaskViewModel(
         viewModelScope.launch {
             _uiState.value = UiState.Loading
             try {
-                val tasks = repository.getTasks()
-                _uiState.value = UiState.Success(tasks)
+                _uiState.value = UiState.Success(repository.getTasks())
             } catch (e: Exception) {
                 _uiState.value = UiState.Error(e.message ?: "Error al cargar las tareas")
             }
         }
+    }
+
+    // Refresh inline: suspend para que onSuccess() corra DESPUES de que la lista este actualizada
+    private suspend fun refreshTasks() {
+        _uiState.value = UiState.Success(repository.getTasks())
     }
 
     fun createTask(
@@ -54,7 +57,7 @@ class TaskViewModel(
         viewModelScope.launch {
             try {
                 repository.createTask(title, description, priority)
-                loadTasks()
+                refreshTasks()
                 onSuccess()
             } catch (e: Exception) {
                 onError()
@@ -75,7 +78,7 @@ class TaskViewModel(
         viewModelScope.launch {
             try {
                 repository.updateTask(id, title, description, priority, isCompleted)
-                loadTasks()
+                refreshTasks()
                 onSuccess()
             } catch (e: Exception) {
                 onError()
@@ -88,9 +91,8 @@ class TaskViewModel(
         viewModelScope.launch {
             try {
                 repository.toggleCompleted(task.id, !task.isCompleted)
-                loadTasks()
+                refreshTasks()
             } catch (e: Exception) {
-                // Error puntual: no borramos la lista, mostramos snackbar
                 _actionError.value = "No se pudo actualizar la tarea"
             }
         }
@@ -100,7 +102,7 @@ class TaskViewModel(
         viewModelScope.launch {
             try {
                 repository.deleteTask(id)
-                loadTasks()
+                refreshTasks()
             } catch (e: Exception) {
                 _actionError.value = "No se pudo eliminar la tarea"
             }
