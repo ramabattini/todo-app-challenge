@@ -1,6 +1,8 @@
 package com.ramiro.todoapp.core
 
+import com.ramiro.todoapp.BuildConfig
+
 object Constants {
-    const val SUPABASE_URL = "https://uygrtcoigvzvvqcasihr.supabase.co/"
-    const val SUPABASE_API_KEY = "sb_publishable_kMcio09f_EuG3NfLjsFNgg_uKiSHKfm"
+    val SUPABASE_URL: String = BuildConfig.SUPABASE_URL
+    val SUPABASE_API_KEY: String = BuildConfig.SUPABASE_API_KEY
 }
