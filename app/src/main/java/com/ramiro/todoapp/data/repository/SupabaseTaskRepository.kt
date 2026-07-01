@@ -4,9 +4,10 @@ import com.ramiro.todoapp.data.model.CreateTaskRequest
 import com.ramiro.todoapp.data.model.Task
 import com.ramiro.todoapp.data.model.UpdateTaskRequest
 import com.ramiro.todoapp.data.network.NetworkClient
+import com.ramiro.todoapp.data.network.SupabaseApi
 
 class SupabaseTaskRepository(
-    private val api = NetworkClient.api
+    private val api: SupabaseApi = NetworkClient.api
 ) : TaskRepository {
 
     override suspend fun getTasks(): List<Task> = api.getTasks()
